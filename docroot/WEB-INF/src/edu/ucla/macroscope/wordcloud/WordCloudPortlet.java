@@ -31,85 +31,11 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  * Portlet implementation class WordCloudPortlet
  */
 public class WordCloudPortlet extends MVCPortlet {
-	public void loadFirstLines(ActionRequest request, ActionResponse response) 
-			throws InvalidParameterException, PortalException, SystemException, SQLException, IOException, PortletException {
-		
-		ArrayList<Long> selectedDocumentIds = new ArrayList<Long>();
-		String count = "0";
-
-		for (Enumeration<String> parameterNames = request.getParameterNames(); parameterNames.hasMoreElements();) {
-			String parameterName = parameterNames.nextElement();
-			
-			if (!parameterName.startsWith("document-")) {
-				continue;
-			}
-			
-			if(ParamUtil.getBoolean(request, parameterName)) {
-				// NOTE: Potential bug if document IDs get more complex
-				Long documentId = Long.parseLong(parameterName.replaceAll("document-", ""));
-				selectedDocumentIds.add(documentId);
-			}
-		}
-		
-		if (selectedDocumentIds.isEmpty()) {
-			throw new InvalidParameterException("No document IDs selected");
-		}
-		
-		List<FirstLinesResult> results = new ArrayList<FirstLinesResult>();
-		
-		for (Long documentId : selectedDocumentIds) {;
-			DLFileEntry document = DLFileEntryLocalServiceUtil.getDLFileEntry(documentId);
-			//BufferedReader br=null;
-			//br = new BufferedReader(new FileReader(document.getTitle()));
-			//br = new BufferedReader(bew FileReader(document));
-			
-			ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-			byte[] buffer = new byte[4096];
-			
-			InputStream stream = document.getContentStream();
-			
-			// 4096 because it's unlikely the first line of a text file will have a first line
-			// greater than 4K long
-			int byteCount = stream.read(buffer, 0, 4096);
-			
-			String firstLine;
-			
-			if (byteCount != -1) {
-				byteStream.write(buffer, 0, byteCount);
-				stream.close();
-				byte[] bytes = byteStream.toByteArray();
-				
-				// Assuming all files will be UTF-8. Not safe for production,
-				// and should be tested before a demo
-				String possibleFirstLines = new String(bytes, "UTF-8");
-				System.out.println("Lines: "+possibleFirstLines);
-				firstLine = possibleFirstLines.split("[\\r\\n]+")[0];
-			} else {
-				firstLine = "<Empty file>";
-			}
-			firstLine = document.getTreePath();//Integer.toString(document.getReadCount());
-			//br.close();
-			count = Long.toString(document.getSize());
-
-			results.add(new FirstLinesResult(document, firstLine, count));
-			//results.add(new FirstLinesResult(document, firstLine));
-		}
-		
-		//SessionMessages.add(request, "results", results);
-		//System.out.println(SessionMessages.get(request, "results"));
-		//System.out.println(results.get(0).getLine());
-		for(int i=0; i< results.size();i++) {
-			response.setRenderParameter("result"+i, results.get(i).getLine());
-			response.setRenderParameter("title"+i, results.get(i).getContent().getTitle());
-			response.setRenderParameter("filecounts"+i, results.get(i).getFileCount());
-		}
-		
-		response.setRenderParameter("resultSize", Integer.toString(results.size()));
-		response.setRenderParameter("jspPage", "/html/wordcloud/results.jsp");
-	}
 	
 	public void tokenize_file(ActionRequest request, ActionResponse response) 
 			throws InvalidParameterException, PortalException, SystemException, SQLException, IOException, PortletException {
+		
+		//System.out.println("Tokenizing file");
 		
 		ArrayList<Long> selectedDocumentIds = new ArrayList<Long>();
 		String count = "0";
@@ -150,7 +76,7 @@ public class WordCloudPortlet extends MVCPortlet {
 			
 			InputStream stream = document.getContentStream();
 			if(stream.read(buffer)==-1){
-				System.out.println("Entire file parsed");
+				//System.out.println("Entire file parsed");
 			}
 			
 			stream.close();
@@ -160,12 +86,12 @@ public class WordCloudPortlet extends MVCPortlet {
 			//Making the dictionary
 			Pattern p = Pattern.compile("[\\w']+");
 			Matcher m = p.matcher(lines);
-			System.out.println("Matcher starts:");
+			//System.out.println("Matcher starts:");
 			dict.put("Test", 1);
 			while(m.find()){
 				String word = "";
 				word=lines.substring(m.start(), m.end());
-				System.out.println("Splitting"+word);
+				//System.out.println("Splitting"+word);
 				if(dict.containsKey(word)){
 					int count1  = dict.get(word);
 					count1++;
@@ -203,25 +129,19 @@ public class WordCloudPortlet extends MVCPortlet {
 			//System.out.println("results: "+sorted_map);
 			//System.out.println(lines);
 		
-			
-			//////////////////// Previous Code reused
-			String firstLine;
-			
-			
 			count = Long.toString(document.getSize());
 
 			results.add(new WordCloudResult(document, sorted_map, count));
-			//results.add(new FirstLinesResult(document, firstLine));
 		}
 		
 		//SessionMessages.add(request, "results", results);
 		//System.out.println(SessionMessages.get(request, "results"));
-		//System.out.println(results.get(0).getLine());
+		//System.out.println(results.size());
 		for(int i=0; i< results.size();i++) {
 			response.setRenderParameter("WordArray"+i, results.get(i).getWordArray());
 			response.setRenderParameter("title"+i, results.get(i).getContent().getTitle());
-			response.setRenderParameter("frequency_count"+i, results.get(i).getFreqCount());
-			response.setRenderParameter("filecounts"+i, results.get(i).getFileCount());
+			response.setRenderParameter("frequency_counts"+i, results.get(i).getFreqCounts());
+			response.setRenderParameter("filesize"+i, results.get(i).getFileSize());
 		}
 		
 		response.setRenderParameter("resultSize", Integer.toString(results.size()));

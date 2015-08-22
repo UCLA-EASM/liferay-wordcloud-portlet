@@ -4,6 +4,13 @@
 
 <%-- <%@ taglib prefix="liferay-ui" uri="http://liferay.com/tld/ui" %> --%>
 <portlet:defineObjects />
+
+<portlet:renderURL var="viewURL">
+<portlet:param name="mvcPath" value="/html/wordcloud/view.jsp"></portlet:param>
+</portlet:renderURL>
+
+<!DOCTYPE html>
+<meta charset="utf-8">
 <body>
 
 <div id="cloud"></div>
@@ -11,7 +18,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
-<h2>Results</h2>
+<h2>Documents in cloud</h2>
 <%String[] words_list = null; 
 int[] freq_list =null;%>
 <% 
@@ -20,18 +27,15 @@ for(int i=0;i<resultSize;i++)  {
 %> 
 	<h4> <%=renderRequest.getParameter("title"+i) %></h4>
 	<p> <%words_list= (String[])renderRequest.getParameterValues("WordArray"+i); %> </p>
-	<p><%System.out.println(words_list[0]); %></p>
-	<p> File Count:<%=renderRequest.getParameter("filecounts"+i) %> </p>
-	<p>Size:<%=words_list[1] %> Second: <%=words_list[2] %></p>
+	<p>File size: <%=renderRequest.getParameter("filesize"+i) %> bytes</p>
 	<br/>
 	<%freq_list= new int[words_list.length];
-	String temp[] =	(String[])renderRequest.getParameterValues("frequency_count"+i); 
+	String temp[] =	(String[])renderRequest.getParameterValues("frequency_counts"+i); 
 	int j=0;
 	for(String s:temp){
 		freq_list[j++]=Integer.parseInt(s)*2;
-		System.out.println(freq_list[j-1]);
+		//System.out.println(freq_list[j-1]);
 	}
-	
 	%>
 <% 
 } 
@@ -58,9 +62,9 @@ for(int i=0;i<resultSize;i++)  {
       .start();
 
   function draw(words) {
-    d3.select("body").append("svg")
-        .attr("width", 500)
-        .attr("height", 500)
+    d3.select("#cloud").append("svg")
+        .attr("width", 300)
+        .attr("height", 300)
       .append("g")
         .attr("transform", "translate(150,150)")
       .selectAll("text")
@@ -76,5 +80,9 @@ for(int i=0;i<resultSize;i++)  {
         .text(function(d) { return d.text; });
   }
 </script>
+
+<aui:button-row>
+    <aui:button onClick="<%= viewURL.toString() %>" type="submit" value="Back"></aui:button>
+</aui:button-row>
 
 </body>

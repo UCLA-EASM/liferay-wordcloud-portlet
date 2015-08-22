@@ -6,6 +6,9 @@
 <meta charset="utf-8">
 <body>
 
+<!-- PMB: This is an older version of the wordcloud generator that does
+     not read its text dynamically from documents. It should not be used. -->
+
 <div id="cloud"></div>
 <script src="<%=request.getContextPath()%>/js/d3.js"></script>
 <script src="<%=request.getContextPath()%>/js/d3.layout.cloud.js"></script>
