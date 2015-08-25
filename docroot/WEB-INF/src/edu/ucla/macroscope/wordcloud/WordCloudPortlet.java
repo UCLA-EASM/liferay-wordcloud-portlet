@@ -3,6 +3,7 @@ package edu.ucla.macroscope.wordcloud;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -81,13 +82,14 @@ public class WordCloudPortlet extends MVCPortlet {
 			
 			stream.close();
 			
-			String lines = new String(buffer);
+			String lines = new String(buffer, StandardCharsets.UTF_8);
 			//System.out.println("Line: "+lines);
 			//Making the dictionary
-			Pattern p = Pattern.compile("[\\w']+");
+			//Pattern p = Pattern.compile("[\\w']+");
+			Pattern p = Pattern.compile("[\\w']+", Pattern.UNICODE_CHARACTER_CLASS);
 			Matcher m = p.matcher(lines);
 			//System.out.println("Matcher starts:");
-			dict.put("Test", 1);
+			//dict.put("Test", 1);
 			while(m.find()){
 				String word = "";
 				word=lines.substring(m.start(), m.end());

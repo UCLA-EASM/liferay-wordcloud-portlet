@@ -10,7 +10,7 @@
 </portlet:renderURL>
 
 <!DOCTYPE html>
-<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF8">
 <body>
 
 <div id="cloud"></div>
@@ -55,7 +55,8 @@ for(int i=0;i<resultSize;i++)  {
         return {text: d, size: 10 + Math.random() * 90};
       }))
       .padding(5)
-      .rotate(function() { return ~~(Math.random() * 2) * 45; })
+      //.rotate(function() { return ~~(Math.random() * 2) * 45; })
+      .rotate(function() { return 0; })
       .font("Impact")
       .fontSize(function(d) { return d.size; })
       .on("end", draw)

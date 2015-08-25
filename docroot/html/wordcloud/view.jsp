@@ -27,10 +27,10 @@ for(int i=0;i<documents.size();i++) {
 <portlet:actionURL name="tokenize_file" var="wordCloudGeneratorURL">
 </portlet:actionURL>
 
-<aui:form action="<%= wordCloudGeneratorURL %>" method="post">
+<aui:form action="<%= wordCloudGeneratorURL %>" method="post" inlineLabel="true">
 	<% for ( int i = 0; i < textDocuments.size(); i++ ) {
 		%>
-	<aui:input type="checkbox"  
+	<aui:input type="checkbox" inlineLabel="left"  
 				name="<%= \"document-\" + Long.toString(textDocuments.get(i).getFileEntryId()) %>" label="<%=textDocuments.get(i).getTitle() %>">
 	</aui:input>
 	<% 
